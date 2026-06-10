@@ -2,19 +2,28 @@ package com.github.felopssauro.calc_api_spring.controller;
 
 import com.github.felopssauro.calc_api_spring.dto.CalculationResult;
 import com.github.felopssauro.calc_api_spring.dto.NumberInput;
+import com.github.felopssauro.calc_api_spring.repository.CalculationRepository;
 import com.github.felopssauro.calc_api_spring.service.CalculatorService;
+import com.github.felopssauro.calc_api_spring.entity.Calculation;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import java.util.Optional;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/calculator")
 @CrossOrigin(origins = "*")
 public class CalculatorController {
+    private final CalculationRepository calculationRepository;
     private final CalculatorService service;
 
-    public CalculatorController(CalculatorService service) {
+    public CalculatorController(CalculatorService service, CalculationRepository calculationRepository) {
         this.service = service;
+        this.calculationRepository = calculationRepository;
     }
 
     @PostMapping("/add")
@@ -43,5 +52,25 @@ public class CalculatorController {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Calculation> getCalculationById(Long id){
+        return calculationRepository.findById(id);
+    }
+    @GetMapping("/history")
+    public List<Calculation> getHistory() {
+        return service.getCalculationHistory();
+    }
+
+    @GetMapping("/history/{id}")
+    public Calculation getHistoryById(@PathVariable Long id) {
+        return service.getCalculationById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Calculation not found"));
+    }
+
+    @GetMapping("/history/operation/{type}")
+    public List<Calculation> getHistoryByOperation(@PathVariable String type) {
+        return service.getCalculationsByOperation(type);
     }
 }
