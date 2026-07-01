@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.Optional;
 import java.util.List;
 
 
@@ -54,10 +53,6 @@ public class CalculatorController {
         }
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Calculation> getCalculationById(Long id){
-        return calculationRepository.findById(id);
-    }
     @GetMapping("/history")
     public List<Calculation> getHistory() {
         return service.getCalculationHistory();
@@ -65,8 +60,11 @@ public class CalculatorController {
 
     @GetMapping("/history/{id}")
     public Calculation getHistoryById(@PathVariable Long id) {
-        return service.getCalculationById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Calculation not found"));
+        Calculation calculation = service.getCalculationById(id);
+        if (calculation == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Calculation not found");
+        }
+        return calculation;
     }
 
     @GetMapping("/history/operation/{type}")
