@@ -6,7 +6,6 @@ import com.github.felopssauro.calc_api_spring.repository.CalculationRepository;
 import com.github.felopssauro.calc_api_spring.service.CalculatorService;
 import com.github.felopssauro.calc_api_spring.entity.Calculation;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,7 +19,8 @@ public class CalculatorController {
     private final CalculationRepository calculationRepository;
     private final CalculatorService service;
 
-    public CalculatorController(CalculatorService service, CalculationRepository calculationRepository) {
+    public CalculatorController(CalculatorService service,
+                                CalculationRepository calculationRepository) {
         this.service = service;
         this.calculationRepository = calculationRepository;
     }

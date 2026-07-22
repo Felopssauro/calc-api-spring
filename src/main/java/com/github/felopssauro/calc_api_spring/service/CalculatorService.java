@@ -14,10 +14,14 @@ import java.util.List;
 public class CalculatorService {
     private final CalculationRepository calculationRepository;
     private final ArithmeticCacheService arithmeticCacheService;
+    private final OperatorUsageTracker operatorUsageTracker;
 
-    public CalculatorService(CalculationRepository calculationRepository, ArithmeticCacheService arithmeticCacheService) {
+    public CalculatorService(CalculationRepository calculationRepository,
+                             ArithmeticCacheService arithmeticCacheService,
+                             OperatorUsageTracker operatorUsageTracker) {
         this.calculationRepository = calculationRepository;
         this.arithmeticCacheService = arithmeticCacheService;
+        this.operatorUsageTracker = operatorUsageTracker;
     }
 
     @Transactional
@@ -25,6 +29,7 @@ public class CalculatorService {
     public int add(int a, int b) {
         int result = arithmeticCacheService.add(a, b);
         saveCalculation("add", a, b, result);
+        operatorUsageTracker.recordUsage("add", a, b);
         return result;
     }
 
@@ -33,6 +38,7 @@ public class CalculatorService {
     public int subtract(int a, int b) {
         int result = arithmeticCacheService.subtract(a, b);
         saveCalculation("subtract", a, b, result);
+        operatorUsageTracker.recordUsage("subtract", a, b);
         return result;
     }
 
@@ -41,6 +47,7 @@ public class CalculatorService {
     public int multiply(int a, int b) {
         int result = arithmeticCacheService.multiply(a, b);
         saveCalculation("multiply", a, b, result);
+        operatorUsageTracker.recordUsage("multiply", a, b);
         return result;
     }
 
@@ -49,6 +56,7 @@ public class CalculatorService {
     public double divide(int a, int b) {
         double result = arithmeticCacheService.divide(a, b);
         saveCalculation("divide", a, b, result);
+        operatorUsageTracker.recordUsage("divide", a, b);
         return result;
     }
 
